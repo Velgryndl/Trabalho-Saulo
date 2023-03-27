@@ -56,7 +56,7 @@ void excluir_aluno(){
 
         alunos[indice -1].nota1 = -1;
 
-        alunos[indice - 1].nota2 = -1; // alunos excluidos recebem dados = 0
+        alunos[indice - 1].nota2 = -1; // alunos excluidos recebem dados = -1
 
         alunos[indice - 1].presenca = -1;
 
@@ -94,7 +94,7 @@ void alterar_aluno(){
 
 
 
-        if (alunos[indice-1].presenca > MAX_PRESENCA) { // limita a quantidade de presenÁas a 50
+        if (alunos[indice-1].presenca > MAX_PRESENCA) { // limita a quantidade de presen√ßas a 50
             alunos[indice-1].presenca = MAX_PRESENCA;
         }
             //verifica status
@@ -127,7 +127,7 @@ void Incluir_aluno(){
         printf("Num. Presenca: ");
         scanf("%d", &alunos[LINHAS +inclu].presenca);
 
-        if (alunos[LINHAS + inclu].presenca > MAX_PRESENCA) { // limita a quantidade de presenÁas a 50
+        if (alunos[LINHAS + inclu].presenca > MAX_PRESENCA) { // limita a quantidade de presen√ßas a 50
             alunos[LINHAS + inclu].presenca = MAX_PRESENCA;
         }
             //verifica status
@@ -199,7 +199,7 @@ Limpar();
 
 void menu(){
     Limpar();
-    int opcao_menu = 0; // opÁao pra escolher menu
+    int opcao_menu = 0; // op√ßao pra escolher menu
     printf("\n\t\t\tGerenciamento de Dados\n\t\t\t======================\n");
     printf("\n\t\t\t1. Listar todos os alunos.\n\n\t\t\t2. Listar os alunos aprovados.\n\n\t\t\t3. Listar os alunos em recuperacao.");
     printf("\n\n\t\t\t4. Listar os alunos reprovados.\n\n\t\t\t5. Incluir aluno.");
@@ -245,7 +245,7 @@ int main(){
         printf("Num. Presenca: ");
         scanf("%d", &alunos[i].presenca);
 
-        if (alunos[i].presenca > MAX_PRESENCA) { // limita a quantidade de presenÁas a 50
+        if (alunos[i].presenca > MAX_PRESENCA) { // limita a quantidade de presen√ßas a 50
             alunos[i].presenca = MAX_PRESENCA;
         }
             //verifica status
