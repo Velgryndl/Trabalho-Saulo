@@ -20,9 +20,7 @@ typedef struct lista
    int status;
 }lista;
 
-
 int inclu =0; // var para aumentar capacidade de alunos
-
 
 void Gerenciar(lista *alunos){
                     // sai do programa ou gerencia
@@ -62,15 +60,9 @@ void excluir_aluno(lista *alunos){
             excluir_aluno(alunos);}
 
         alunos[indice -1].nota1 = -1;
-
         alunos[indice - 1].nota2 = -1; // alunos excluidos recebem dados = -1
-
         alunos[indice - 1].presenca = -1;
-
         alunos[indice -1].status = -1;
-
-
-
 
         Gerenciar(alunos); // fecha programa ou vai pro menu
 
@@ -100,7 +92,7 @@ void alterar_aluno(lista *alunos){
     if(alunos[indice - 1].nota1 == -1){ // nao altera aluno excluido
         alterar_aluno(alunos);}
 
-    Limpar();
+        Limpar();
 
         printf("Nota 1B: ");
         scanf("%f", &alunos[indice -1].nota1);
@@ -108,8 +100,6 @@ void alterar_aluno(lista *alunos){
         scanf("%f", &alunos[indice - 1].nota2); // altera dados aluno
         printf("Num. Presenca: ");
         scanf("%d", &alunos[indice - 1].presenca); // altera os dados, nao a pessoa entao nao altera o ra
-
-
 
         if (alunos[indice-1].presenca > MAX_PRESENCA) { // limita a quantidade de presenças a 50
             alunos[indice-1].presenca = MAX_PRESENCA;   // se falarem que a nota é maior que 50...
