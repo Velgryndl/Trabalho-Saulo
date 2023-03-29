@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define LINHAS 3
+#define LINHAS 10
 #define MAX_PRESENCA 50
 
 void Limpar(){ // limpa a tela msm se for pc linux/windows
@@ -11,7 +11,7 @@ void Limpar(){ // limpa a tela msm se for pc linux/windows
 #endif
 }
 
-typedef struct lista
+struct lista
 {
    int ra;
    int presenca;
@@ -20,9 +20,7 @@ typedef struct lista
    int status;
 }lista;
 
-int inclu =0; // var para aumentar capacidade de alunos
-
-void Gerenciar(lista *alunos){
+void Gerenciar(struct lista alunos[], int *quantAlunos){
                     // sai do programa ou gerencia
     int a = 0;
     printf("\nSair( 0 )  |  Gerenciar ( 1 )\n\t   ");
@@ -31,51 +29,48 @@ void Gerenciar(lista *alunos){
     case 0:
         exit(0);
     case 1:
-        menu(alunos);
+        menu(alunos, &*quantAlunos);
         }
 
 }
 
-void excluir_aluno(lista *alunos){
+void excluir_aluno(struct lista alunos[], int *quantAlunos){
     Limpar();
 
-    printf("Selcione o aluno para Excluir.\n");
+    printf("Selecione o aluno para excluir.\n");
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n");
-    for (int i = 0; i < LINHAS + inclu; i++) { //roda o num de linhas se inclui for 0, quando inclu aluno roda + 1 vez pra mostrar o aluno incluido
-            if(alunos[i].nota1 == -1 && alunos[i].nota2 == -1 && alunos[i].presenca == -1 && alunos[i].status == -1){
-               continue; } // nao imprime alunos excluidos
+    for (int i = 0; i < *quantAlunos; i++) {
         printf("%d\t%.1f\t%.1f\t%d\t%d\tAluno:%d\n", alunos[i].ra , alunos[i].nota1, alunos[i].nota2,
                 alunos[i].presenca,alunos[i].status,i+1);
     }
 
-    int indice =0;
+    int indice = 0;
+    printf("\nDigite o numero do aluno a ser excluido: ");
+    scanf("%d", &indice);
 
-    printf("\nExcluir aluno: "); // escolhe aluno para excluir
-    scanf("%d",&indice);
+    if (indice <= 0 || indice > *quantAlunos) {
+        excluir_aluno(alunos, quantAlunos);
+    }
 
-        if(indice > LINHAS + inclu || indice == 0){ // nao exclui alunos que nao existem
-            excluir_aluno(alunos);}
+    // Troca o aluno selecionado com o último da lista
+    struct lista temp = alunos[indice-1]; // temp é uma var. temporaria so pra fazer a troca
+    alunos[indice-1] = alunos[*quantAlunos-1];
+    alunos[*quantAlunos-1] = temp;
 
-        if(alunos[indice - 1].nota1 == -1){ // nao exclui aluno ja excluido
-            excluir_aluno(alunos);}
+    // Remove o último aluno da lista
+    *quantAlunos -= 1;
 
-        alunos[indice -1].nota1 = -1;
-        alunos[indice - 1].nota2 = -1; // alunos excluidos recebem dados = -1
-        alunos[indice - 1].presenca = -1;
-        alunos[indice -1].status = -1;
-
-        Gerenciar(alunos); // fecha programa ou vai pro menu
-
+    Gerenciar(alunos, &*quantAlunos);
 }
 
-void alterar_aluno(lista *alunos){
+
+void alterar_aluno(struct lista alunos[], int *quantAlunos){
     Limpar();
 
     printf("Selcione o aluno para alterar.\n");
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n");
-    for (int i = 0; i < LINHAS + inclu; i++) { //roda o num de linhas se inclui for 0, quando inclu aluno roda + 1 vez pra mostrar o aluno incluido
-            if(alunos[i].nota1 == -1 && alunos[i].nota2 == -1 && alunos[i].presenca == -1 && alunos[i].status == -1){
-               continue; } // nao imprime alunos excluidos
+    for (int i = 0; i < *quantAlunos; i++) { //roda o num de linhas se inclui for 0, quando inclu aluno roda + 1 vez pra mostrar o aluno incluido
+
         printf("%d\t%.1f\t%.1f\t%d\t%d\tAluno:%d\n", alunos[i].ra , alunos[i].nota1, alunos[i].nota2,
                 alunos[i].presenca,alunos[i].status,i+1);
     }
@@ -85,14 +80,11 @@ void alterar_aluno(lista *alunos){
     printf("\nAlterar aluno: "); // escolhe qual aluno alterar
     scanf("%d",&indice);
 
-    if(indice > LINHAS + inclu || indice == 0){ // nao altera alunos que nao existem
-            alterar_aluno(alunos);
+    if(indice > *quantAlunos|| indice == 0){ // nao altera alunos que nao existem
+            alterar_aluno(alunos, &*quantAlunos);
         }
 
-    if(alunos[indice - 1].nota1 == -1){ // nao altera aluno excluido
-        alterar_aluno(alunos);}
-
-        Limpar();
+    Limpar();
 
         printf("Nota 1B: ");
         scanf("%f", &alunos[indice -1].nota1);
@@ -113,97 +105,92 @@ void alterar_aluno(lista *alunos){
             alunos[indice-1].status = 0;
         }
 
-Gerenciar(alunos);
+Gerenciar(alunos, &*quantAlunos);
 
     }
 
-void Incluir_aluno(lista *alunos){
+void Incluir_aluno(struct lista alunos[], int *quantAlunos){
     Limpar();
 
-        if(LINHAS + inclu > 50){
-                printf("%d",inclu);
+        if(*quantAlunos > LINHAS){
             printf("\nArmazenamento cheio.\n"); // limita a 50 alunos incluidos
-            Gerenciar(alunos);
+            Gerenciar(alunos, &*quantAlunos);
         }
-        printf("%d",inclu);
         printf("RA: ");
-        scanf("%d", &alunos[LINHAS + inclu].ra);
+        scanf("%d", &alunos[*quantAlunos].ra);
         printf("Nota 1B: ");
-        scanf("%f", &alunos[LINHAS + inclu].nota1); // coloca dados de novo aluno
+        scanf("%f", &alunos[*quantAlunos].nota1); // coloca dados de novo aluno
         printf("Nota 2B: ");
-        scanf("%f", &alunos[LINHAS + inclu].nota2);
+        scanf("%f", &alunos[*quantAlunos].nota2);
         printf("Num. Presenca: ");
-        scanf("%d", &alunos[LINHAS + inclu].presenca);
+        scanf("%d", &alunos[*quantAlunos].presenca);
 
-        if (alunos[LINHAS + inclu].presenca > MAX_PRESENCA) { // limita a quantidade de presenças a 50
-            alunos[LINHAS + inclu].presenca = MAX_PRESENCA;
+        if (alunos[*quantAlunos].presenca > MAX_PRESENCA) { // limita a quantidade de presenças a 50
+            alunos[*quantAlunos].presenca = MAX_PRESENCA;
         }
             //verifica status
-    if ((alunos[LINHAS + inclu].nota1 + alunos[LINHAS + inclu].nota2) / 2 >= 6.0 && alunos[LINHAS + inclu].presenca >= 37.5) { // > = a 75% de aulas de total de 50 = 38 aulas para passar.
-            alunos[LINHAS + inclu].status = 2;
-        } else if ( (alunos[LINHAS + inclu].nota1 + alunos[LINHAS + inclu].nota2) / 2 >= 3.0 &&( alunos[LINHAS + inclu].nota1 + alunos[LINHAS + inclu].nota2) / 2 < 6.0 && alunos[LINHAS + inclu].presenca >= 37.5) {
-            alunos[LINHAS + inclu].status = 1;
-        } else if((alunos[LINHAS + inclu].nota1 + alunos[LINHAS + inclu].nota2) / 2 < 3.0 && alunos[LINHAS + inclu].presenca <= 37.5){
-            alunos[LINHAS + inclu].status = 0;
+    if ((alunos[*quantAlunos].nota1 + alunos[*quantAlunos].nota2) / 2 >= 6.0 && alunos[*quantAlunos].presenca >= 37.5) { // > = a 75% de aulas de total de 50 = 38 aulas para passar.
+            alunos[*quantAlunos].status = 2;
+        } else if ( (alunos[*quantAlunos].nota1 + alunos[*quantAlunos].nota2) / 2 >= 3.0 &&( alunos[*quantAlunos].nota1 + alunos[*quantAlunos].nota2) / 2 < 6.0 && alunos[*quantAlunos].presenca >= 37.5) {
+            alunos[*quantAlunos].status = 1;
+        } else if((alunos[*quantAlunos].nota1 + alunos[*quantAlunos].nota2) / 2 < 3.0 && alunos[*quantAlunos].presenca <= 37.5){
+            alunos[*quantAlunos].status = 0;
         }
-        inclu++; // aumenta capacidade de aluno, e faz os for pra mostrar os alunos rodar + 1 pra que mostre o aluno incluido
-        Gerenciar(alunos);    // quando checa o num de vez que vai rodar. ex: LINHAS + inclu
+
+        *quantAlunos+=1; // aumenta capacidade de aluno, e faz os for pra mostrar os alunos rodar + 1 pra que mostre o aluno incluido
+        Gerenciar(alunos, &*quantAlunos);    // quando checa o num de vez que vai rodar. ex: LINHAS + inclu
 
 }
 
-void Listar_reprovados(lista *alunos){
+void Listar_reprovados(struct lista alunos[], int *quantAlunos){
 Limpar();
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n"); // mostra alunos reprovados
-    for (int i = 0; i < LINHAS + inclu; i++) {
+    for (int i = 0; i < *quantAlunos; i++) {
             if(alunos[i].status == 0){
-                    if(alunos[i].nota1 == -1 && alunos[i].nota2 == -1 && alunos[i].presenca == -1 && alunos[i].status == -1){
-               continue; } // nao imprime alunos excluidos
+
         printf("%d \t %.1f \t %.1f \t %d \t %d \n", alunos[i].ra, alunos[i].nota1,
                 alunos[i].nota2, alunos[i].presenca, alunos[i].status); }
     }
-        Gerenciar(alunos);
+        Gerenciar(alunos, &*quantAlunos);
 }
 
-void Listar_recuperacao(lista *alunos){
+void Listar_recuperacao(struct lista alunos[], int *quantAlunos){
 Limpar();
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n"); // mostra alunos em rec
-    for (int i = 0; i < LINHAS + inclu; i++) {
+    for (int i = 0; i < *quantAlunos; i++) {
             if(alunos[i].status == 1){
-                    if(alunos[i].nota1 == -1 && alunos[i].nota2 == -1 && alunos[i].presenca == -1 && alunos[i].status == -1){
-               continue; } // nao imprime alunos excluidos
+
         printf("%d \t %.1f \t %.1f \t %d \t %d \n", alunos[i].ra, alunos[i].nota1,
                 alunos[i].nota2, alunos[i].presenca, alunos[i].status); }
     }
-        Gerenciar(alunos);
+        Gerenciar(alunos, &*quantAlunos);
 }
 
-void Listar_aprovados(lista *alunos){
+void Listar_aprovados(struct lista alunos[], int *quantAlunos){
 Limpar();
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n"); // mostra alunos aprovados
-    for (int i = 0; i < LINHAS + inclu; i++) {
+    for (int i = 0; i < *quantAlunos; i++) {
             if(alunos[i].status == 2){
-                    if(alunos[i].nota1 == -1 && alunos[i].nota2 == -1 && alunos[i].presenca == -1 && alunos[i].status == -1){
-               continue; } // nao imprime alunos excluidos
+
         printf("%d \t %.1f \t %.1f \t %d \t %d \n", alunos[i].ra, alunos[i].nota1,
                 alunos[i].nota2, alunos[i].presenca, alunos[i].status); }
     }
-        Gerenciar(alunos);
+        Gerenciar(alunos, &*quantAlunos);
 }
 
-void Listar_alunos(lista *alunos){
+void Listar_alunos(struct lista alunos[], int *quantAlunos){
 Limpar();
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n"); // mostra alunos
-    for (int i = 0; i < LINHAS + inclu ; i++) {
-            if(alunos[i].nota1 == -1 && alunos[i].nota2 == -1 && alunos[i].presenca == -1 && alunos[i].status == -1){
-               continue; } // nao imprime alunos excluidos
+    for (int i = 0; i < *quantAlunos; i++) {
+
         printf("%d \t %.1f \t %.1f \t %d \t %d \n", alunos[i].ra, alunos[i].nota1,
                 alunos[i].nota2, alunos[i].presenca, alunos[i].status);
     }
-        Gerenciar(alunos);
+        Gerenciar(alunos, &*quantAlunos);
 
 }
 
-void menu(lista *alunos){
+void menu(struct lista alunos[], int *quantAlunos){
     Limpar();
 
     int opcao_menu = 0; // opçao pra escolher menu
@@ -215,37 +202,38 @@ void menu(lista *alunos){
 
     switch(opcao_menu){
         case 1:
-            Listar_alunos(alunos); break;
+            Listar_alunos(alunos, &*quantAlunos); break;
         case 2:
-            Listar_aprovados(alunos); break;
+            Listar_aprovados(alunos, &*quantAlunos); break;
         case 3:
-            Listar_recuperacao(alunos); break;
+            Listar_recuperacao(alunos, &*quantAlunos); break;
         case 4:
-            Listar_reprovados(alunos); break;
+            Listar_reprovados(alunos, &*quantAlunos); break;
         case 5:
-            Incluir_aluno(alunos); break;
+            Incluir_aluno(alunos, &*quantAlunos); break;
         case 6:
-            alterar_aluno(alunos); break;
+            alterar_aluno(alunos, &*quantAlunos); break;
         case 7:
-            excluir_aluno(alunos); break;
+            excluir_aluno(alunos, &*quantAlunos); break;
         case 8:
             exit(0); break;
         default:
             Limpar();
             printf("Opcao Invalida.\n");
             system("pause");
-            menu(alunos);
+            menu(alunos, &*quantAlunos);
     }
 
 }
 
 int main(){
 
-        lista alunos[50]; // inicia a struct
+        struct lista alunos[LINHAS]; // inicia a struct
+        int quantAlunos;
 
         Limpar();
 
-    for(int i=0;i<LINHAS;i++){
+    for(int i=0;i<3;i++){
         printf("\nAluno %d\n", i+1); //coloca dados dos primeiros alunos
         printf("Digite o RA: ");
         scanf("%d", &alunos[i].ra);
@@ -260,23 +248,23 @@ int main(){
             alunos[i].presenca = MAX_PRESENCA;
         }
             //verifica status
-    if ((alunos[i].nota1 + alunos[i].nota2) / 2 >= 6.0 && alunos[i].presenca >= 37.5) { // > = a 75% de aulas de total de 50 = 38 aulas para passar.
-            alunos[i].status = 2;
-        } else if ( (alunos[i].nota1 + alunos[i].nota2) / 2 >= 3.0 &&( alunos[i].nota1 + alunos[i].nota2) / 2 < 6.0 && alunos[i].presenca >= 37.5) {
-            alunos[i].status = 1;
-        } else if((alunos[i].nota1 + alunos[i].nota2) / 2 < 3.0 && alunos[i].presenca <= 37.5){
-            alunos[i].status = 0;
-        }
-
+        if ((alunos[i].nota1 + alunos[i].nota2) / 2 >= 6.0 && alunos[i].presenca >= 37.5) { // > = a 75% de aulas de total de 50 = 38 aulas para passar.
+                alunos[i].status = 2;
+            } else if ( (alunos[i].nota1 + alunos[i].nota2) / 2 >= 3.0 &&( alunos[i].nota1 + alunos[i].nota2) / 2 < 6.0 && alunos[i].presenca >= 37.5) {
+                alunos[i].status = 1;
+            } else if((alunos[i].nota1 + alunos[i].nota2) / 2 < 3.0 && alunos[i].presenca <= 37.5){
+                alunos[i].status = 0;
+            }
+        quantAlunos+=1;
     }
         Limpar();
     printf("Numero\tNota 1\tNota 2\tPres.\tStatus\n"); // mostra alunos
-    for (int i = 0; i < LINHAS; i++) {
+    for (int i = 0; i < quantAlunos; i++) {
         printf("%d \t %.1f \t %.1f \t %d \t %d \n", alunos[i].ra, alunos[i].nota1,
                 alunos[i].nota2, alunos[i].presenca, alunos[i].status);
     }
 
-    Gerenciar(alunos); // fecha programa ou vai pro Menu
+    Gerenciar(alunos, &quantAlunos); // fecha programa ou vai pro Menu
 
     return 0;
 }
